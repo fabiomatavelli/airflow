@@ -66,13 +66,15 @@ class GithubOperator(BaseOperator):
             hook = GithubHook(github_conn_id=self.github_conn_id)
             resource = hook.client
 
-            github_result = getattr(resource, self.method_name)(**self.github_method_args)
+            github_result = getattr(resource, self.method_name)(
+                **self.github_method_args)
             if self.result_processor:
-                return self.result_processor(github_result)
+                return self.result_processor(github_result, context)
 
             return github_result
 
         except GithubException as github_error:
-            raise AirflowException(f"Failed to execute GithubOperator, error: {str(github_error)}")
+            raise AirflowException(
+                f"Failed to execute GithubOperator, error: {str(github_error)}")
         except Exception as e:
             raise AirflowException(f'GitHub operator error: {str(e)}')
